@@ -21,6 +21,7 @@ const eleitor = require ('./router/eleitor');
 const parceiro = require ('./router/parceiro');
 const grupo = require ('./router/grupo');
 const grafico = require('./router/grafico');
+const agenda = require('./router/agenda')
 app.use(cors('Access-Control-Allow-Origin', '*'));
 
 
@@ -48,6 +49,7 @@ app.use('/api', grupo)
 app.use('/api', authentication);
 app.use('/api', solicitacao);
 app.use('/api', grafico);
+app.use('/api', agenda);
 // app.use('/api', pedido);
 
 

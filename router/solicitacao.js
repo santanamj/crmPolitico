@@ -6,6 +6,7 @@ var api = express.Router();
 
 api.post('/newSolicitacao',  solicitacoesController.newSolicitacao);
 api.get('/oneSolicitacao/:id',  solicitacoesController.oneSolicitacao);
+api.get('/getsolicitacoes',  solicitacoesController.getsolicitacoes);
 api.put('/updateSolicitacao',  solicitacoesController.updateSolicitacao);
 // api.get('/getsolicitacoes',  solicitacoesController.getsolicitacoes);
 // api.get('/getlistsolicitacoes',  solicitacoesController.getlistsolicitacoes);

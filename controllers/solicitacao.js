@@ -37,13 +37,33 @@ exports.oneSolicitacao = (req, res, next) => {
         }
     })
 }
-exports.updateSolicitacao =  (req, res) =>{    
-   
+exports.getsolicitacoes = (req, res)=>{
+    Solicitacao.countDocuments({}, (err, total)=>{
+    Solicitacao.countDocuments({status: 'concluido'}, (err, concluido)=>{
+        Solicitacao.countDocuments({status: 'cancelado'}, (err, cancelado)=>{
+            Solicitacao.countDocuments({status: 'Pendente'}, (err, pendente)=>{
+        if(err){
+            res.json({success: false})
+        }else{           
+            const valores = {
+                total: total,
+                concluido:concluido,
+                cancelado: cancelado,
+                pendente: pendente
+            }
+            console.log(valores)
+            res.json(valores)
+        }
+    })
+})
+})
+})
+}
+exports.updateSolicitacao =  (req, res) =>{      
     if (!req.body._id) {
       res.json({ success: false, message: 'No dependente id provided' }); // Return error message
     } else {
-  var data = req.body;
- 
+  var data = req.body; 
   Solicitacao.findByIdAndUpdate(req.body._id, data,  (err, solicitacao) => {
    if (err) {
       res.status(500).send({ message: 'Error al actualizar el usuario' });

@@ -30,11 +30,10 @@ exports.newParceiro = (req, res, next) => {
         tipo: req.body.tipo,
         grupo: req.body.grupo,
         sexo: req.body.sexo,
-        dataNascimento: dataNascimento,
-        domicilioParceiro: req.body.domicilioParceiro,
-        indicaoContato: req.body.indicaoContato,
-        opcaoParceiroal: req.body.opcaoParceiroal,
-        quemIndicou: req.body.quemIndicou,
+        dataNascimento: req.body.datnsc,
+        domicilioParceiro: req.body.domicilioParceiro,        
+        opcaoEleitoral: req.body.opcaoEleitoral,
+        parceiro: req.body.parceiro,
         endereco: req.body.endereco,
         statusVoto: req.body.statusVoto,
         observacao: req.body.observacao,
@@ -49,18 +48,23 @@ exports.newParceiro = (req, res, next) => {
         }
     })
 } 
-exports.getlistParceiros = (req, res, next) => {
-   
+exports.getlistParceiros = (req, res, next) => {   
     Parceiro.find({}, (err, parceiros) => {
-
         if (err) {
             res.json({ success: false, err })
         } else {
-
             res.send(parceiros)
-
         }
     }).sort({ '_id': -1 });
+}
+exports.getCountParceiros = (req, res, next) => {   
+    Parceiro.countDocuments({}, (err, parceiros) => {
+        if (err) {
+            res.json({ success: false, err })
+        } else {
+            res.json(parceiros)
+        }
+    })
 }
 exports.getParceiros = (req, res, next) => {
     var s = req.query.term;
@@ -94,7 +98,7 @@ exports.oneParceiro = (req, res, next) => {
         } else {
             if (!parceiro) {
                 res.status(404).send({ message: 'Pedido não existe' })
-            } else {
+            } else {              
                 res.send(parceiro);
             }
         }
@@ -124,30 +128,7 @@ exports.oneParceiroSolicitacao = (req, res, next) => {
         }
     })
 }
-exports.oneParceiroTitulo = (req, res, next) => {
-    const parceiroId = req.params.id;
-    Parceiro.findById({ '_id': parceiroId }, (err, parceiro) => {
-        if (err) {
-            res.status(500).send({ message: 'Erro na solicitação' })
-        } else {
-            if (!parceiro) {
-                res.status(404).send({ message: 'Pedido não existe' })
-            } else {
-                //get dependentes
-                const titulo = parceiro.titulo;
-                Titulo.find({ 'titulo': titulo }, (req, crntitulos) => {
-                    if (err) {
-                        res.status(500).send({ message: 'erro em buscar crnmanutencoes' })
-                    } else {
-                        console.log(crntitulos)
-                        res.send(crntitulos);
-                    }
-                }).sort({ '_id': -1 })//.limit(5);      
 
-            }
-        }
-    })
-}
 
 exports.imgParceiro = (req, res) => {
     console.log('Meu log', req.params)
@@ -176,42 +157,49 @@ exports.imgParceiro = (req, res) => {
         })
     })
 }
-exports.grupo = (req, res) => {
-    Grupo.find({}, (err, grupos) => {
-        if (err) {
-            res.json({ success: false, err })
-        } else {
-            res.json(grupos)
-        }
-    })
-}
-exports.numerotitulo = (req, res)=>{
-    Numerotitulo.find({}, (err, numerotitulos)=>{
-      if(err){
-          res.json({success: false, message: err})
-      }else{
-      res.send(numerotitulos);
-      }
-  })
-  }
-  exports.updatenumeroTitulo =  (req, res) =>{
+exports.updateParceiro =  (req, res) =>{     
+    console.log(req.body) 
     if (!req.body._id) {
       res.json({ success: false, message: 'No dependente id provided' }); // Return error message
     } else {
-  var data = req.body.numerotitulo;
-  console.log("update nosso numero", data);
-  Numerotitulo.findByIdAndUpdate({ _id: req.body._id }, { $set: { "valor": data } }, { new: true }, (err, parceiro) => {
+  var data = req.body; 
+  Parceiro.findByIdAndUpdate(req.body._id, data,  (err, parceiro) => {
    if (err) {
       res.status(500).send({ message: 'Error al actualizar el usuario' });
     } else {
       if (!parceiro) {
         res.status(404).send({ message: 'No se ha podido actualizar el usuario' });
-      } else {
-          
+      } else {      
+          console.log('parceiro', parceiro) 
         res.status(200).send({ success: true, message: 'usuário atualizado' });
       }
     }
   });
+  }  
   }
-  
-  }
+  exports.deleteParceiro = (req, res) => {
+    if (!req.params.id) {
+        res.json({ success: false, message: 'No id provided' }); // Return error message
+      } else {
+    Parceiro.findOne({ _id: req.params.id }, (err, parceiro) => {
+        console.log('antes', req.params.id)
+        if (err) {
+            res.json({ success: false, message: 'Invalid id' }); // Return error message
+          } else {
+            // Check if parceiro was found in database
+            if (!parceiro) {
+              res.json({ success: false, messasge: 'Parceiro was not found' }); // Return error message
+            }  else {       
+            parceiro.remove((err) => {
+                console.log('primeir SubParceiro', parceiro)
+                if (err) {
+                    res.json({ success: false, message: err }); // Return error message
+                  } else {
+                    res.json({ success: true, message: 'parceiro deletado!' }), console.log('SubParceiro', parceiro); // Return success message
+                  }
+            });
+        }
+    }
+    });
+}
+};
